@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import linalg, interpolate
 import matplotlib.pyplot as plt
-
+from scipy import spatial
 
 class MAC():
 
@@ -53,10 +53,19 @@ def interpZ(coords, z, scale, xres=25, yres=50):
     pass
 
 
-def snap(array,value):
-    """findsand returns the nearest value in array"""
+def snap2(array,value):
+    """finds and returns the nearest value in array"""
     idx = (np.abs(array-value)).argmin()
     return array[idx]
+
+
+def snap(array,value):
+    """
+    snaps value to nearest neighbor in array. uses scipy's spatial.KDTree for nearest-neighbor lookup.
+    works for n dimensional data
+    """
+    idx = spatial.KDTree(array).query(value)[1]
+    return array[idx], idx
 
 
 def mag2db(x):
