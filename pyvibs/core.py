@@ -3,6 +3,19 @@ from scipy import linalg, interpolate
 import matplotlib.pyplot as plt
 from scipy import spatial
 
+
+
+class FRF():
+    pass
+
+class DataLogger():
+    pass
+
+class DataTrigger():
+    pass
+
+
+
 class MAC():
 
     def __init__(self,u1,u2,**kwargs):
@@ -10,10 +23,11 @@ class MAC():
         self.u2 = u2
         self.m = get_mac(u1,u2)
 
-    def __str__(self):
+    def __repr__(self):
         return 'Modal Assurance Criterion:\n{}'.format(self.m)
 
     def plot(self):
+        plt.figure()
         plt.imshow(self.m, aspect='auto', interpolation='none')
         plt.show()
 
@@ -37,20 +51,30 @@ def get_mac(U1,U2):
 
 def _mac_single(u1,u2):
     """ macro for get_mac function. returns mac value for 1d arrays"""
-    m = (np.inner(u1.conj(),u2)*np.inner(u2.conj(),u1)) / (np.inner(u1.conj(),u1)*np.inner(u2.conj(),u2))
-    return m
+    return (np.inner(u1.conj(),u2)*np.inner(u2.conj(),u1)) / (np.inner(u1.conj(),u1)*np.inner(u2.conj(),u2))
 
 
-def freq_residual(f1,f2):
-    pass
 
+def pair_modes(u1,u2):
+    """pairs to shape arrays. returns a list of pairids"""
+    
+    # get modal assurance criterion
+    m = get_mac(u1,u2)
+    # sort from 0->1 in terms of shape 'likeness'
+    ms = np.argsort(m)
 
-def pair_modes(f1,f2):
-    pass
+    # return indices of best shape pairs (pairing u2 [slave] to u1 [master])
+    pairid = ms[:,-1]
 
-
-def interpZ(coords, z, scale, xres=25, yres=50):
-    pass
+    # remove pairs retaining order
+    # WORKS ONLY IN PYTHON VERSIONS >= 3.6
+    # TODO: check python version
+    #import sys
+    #if sys.version_info >= (3,6):
+    #    pairid = list(dict.fromkeys(pairid)))
+    #else:
+    #    pairid = unique(pairid)
+    return list(dict.fromkeys(pairid))
 
 
 def snap2(array,value):
@@ -59,13 +83,31 @@ def snap2(array,value):
     return array[idx]
 
 
+def search(array,value):
+    """
+    uses search to find nearest neighbor in array and returns value.
+    works for n dimensional data
+    """
+    return spatial.KDTree(array).query(value)[1]
+
+
 def snap(array,value):
     """
     snaps value to nearest neighbor in array. uses scipy's spatial.KDTree for nearest-neighbor lookup.
     works for n dimensional data
     """
     idx = spatial.KDTree(array).query(value)[1]
-    return array[idx], idx
+    return array[idx]
+
+
+def unique(seq):
+    """
+    return array of unique values with the original order preserved
+    (i.e. only returns first values found in order)
+    """
+    seen = set()
+    seen_add = seen.add
+    return [x for x in seq if not (x in seen or seen_add(x))]
 
 
 def mag2db(x):
@@ -79,3 +121,7 @@ def hermit(x):
     conjugate transpose
     """
     return x.conj().T
+
+
+def freq_residual(f1,f2):
+    pass

@@ -1,2 +1,3 @@
 
-from vibs.core import *
+from pyvibs.core import *
+import pyvibs.plots
