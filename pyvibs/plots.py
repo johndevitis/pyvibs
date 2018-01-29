@@ -38,7 +38,7 @@ def plot_interp(coords, shape, bcoords, xres=50, yres=50, projections=True):
                         linewidth=0,vmin=zz[0], vmax=zz[1], shade=False, cmap=C)
 
     # plot wireframe
-    if False: ax.plot_wireframe(X,Y,Z, alpha=0.33)
+    if False: ax.plot_wireframe(X,Y,Z, alpha=0.44)
 
     # plot projects
     if projections:
